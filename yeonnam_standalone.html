@@ -885,7 +885,7 @@ function _doUpdateView() {
 
     // 리스트 (최대 40개씩 지연 렌더)
     const count=filtered.length;
-    const infoPanel=document.getElementById('panel-list');
+    const infoPanel=document.getElementById('panel-list-inner');
     if(!count){
         infoPanel.innerHTML='<div class="flex h-full items-center justify-center text-slate-400 text-xs font-bold">해당 조건의 매물이 없습니다.</div>';
         document.getElementById('avgTag').innerText='데이터 없음';
