@@ -436,13 +436,12 @@ function switchRightTab(tab) {
             <div id="panel-dash" style="display:none;overflow-y:auto;flex:1;padding:12px;">
                 <div id="dash-content"></div>
             </div>
-            <div id="panel-list" style="display:flex;flex-direction:column;flex:1;overflow:hidden;">
-                <div style="display:flex;gap:4px;padding:6px 8px 4px;flex-shrink:0;border-bottom:1px solid #f1f5f9;">
-                    <button onclick="setSortMode('default')" id="sort-default" style="flex:1;padding:4px 0;font-size:10px;font-weight:700;border-radius:6px;border:1px solid #2563eb;background:#2563eb;color:#fff;cursor:pointer;">최신순</button>
-                    <button onclick="setSortMode('rent')" id="sort-rent" style="flex:1;padding:4px 0;font-size:10px;font-weight:700;border-radius:6px;border:1px solid #e2e8f0;background:#fff;color:#94a3b8;cursor:pointer;">가격순</button>
-                    <button onclick="setSortMode('area')" id="sort-area" style="flex:1;padding:4px 0;font-size:10px;font-weight:700;border-radius:6px;border:1px solid #e2e8f0;background:#fff;color:#94a3b8;cursor:pointer;">면적순</button>
-                </div>
-                <div id="panel-list-inner" style="overflow-y:auto;flex:1;padding:8px;display:flex;flex-direction:column;gap:8px;"></div>
+            <div id="panel-list" style="display:flex;flex-direction:column;overflow-y:auto;flex:1;padding:8px;gap:8px;">
+            <div style="display:flex;gap:4px;padding:4px 0 2px;flex-shrink:0;">
+                <button onclick="setSortMode('default')" id="sort-default" style="flex:1;padding:4px 0;font-size:10px;font-weight:700;border-radius:6px;border:1px solid #2563eb;background:#2563eb;color:#fff;cursor:pointer;">최신순</button>
+                <button onclick="setSortMode('rent')" id="sort-rent" style="flex:1;padding:4px 0;font-size:10px;font-weight:700;border-radius:6px;border:1px solid #e2e8f0;background:#fff;color:#94a3b8;cursor:pointer;">가격순</button>
+                <button onclick="setSortMode('area')" id="sort-area" style="flex:1;padding:4px 0;font-size:10px;font-weight:700;border-radius:6px;border:1px solid #e2e8f0;background:#fff;color:#94a3b8;cursor:pointer;">면적순</button>
+            </div>
             </div>
             <div id="panel-bookmark" style="display:none;overflow-y:auto;flex:1;padding:8px;gap:8px;flex-direction:column;">
             </div>
@@ -886,7 +885,7 @@ function _doUpdateView() {
 
     // 리스트 (최대 40개씩 지연 렌더)
     const count=filtered.length;
-    const infoPanel=document.getElementById('panel-list-inner');
+    const infoPanel=document.getElementById('panel-list');
     if(!count){
         infoPanel.innerHTML='<div class="flex h-full items-center justify-center text-slate-400 text-xs font-bold">해당 조건의 매물이 없습니다.</div>';
         document.getElementById('avgTag').innerText='데이터 없음';
@@ -1031,6 +1030,54 @@ function renderScoreBadge(prop) {
         <div style="display:flex;align-items:center;gap:10px;">
             <div style="font-size:28px;font-weight:900;color:${s.grade.color};line-height:1;">${s.total}<span style="font-size:13px;font-weight:700;margin-left:2px;">점</span></div>
             <div style="background:${s.grade.color}18;border:1px solid ${s.grade.color}40;border-radius:6px;padding:3px 10px;font-size:11px;font-weight:700;color:${s.grade.color};">${s.grade.label}</div>
+            <button onclick="const t=document.getElementById('score-table-box');t.style.display=t.style.display==='none'?'block':'none';this.textContent=this.textContent==='점수표 ▼'?'점수표 ▲':'점수표 ▼';" style="margin-left:auto;font-size:10px;font-weight:700;color:#3b82f6;background:none;border:1px solid #3b82f6;border-radius:6px;padding:3px 8px;cursor:pointer;">점수표 ▼</button>
+        </div>
+        <div id="score-table-box" style="display:none;margin-top:10px;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;">
+            <table style="width:100%;border-collapse:collapse;font-size:10px;">
+                <thead>
+                    <tr style="background:#f8fafc;">
+                        <th style="padding:6px 8px;text-align:left;color:#64748b;font-weight:700;border-bottom:1px solid #e2e8f0;">항목</th>
+                        <th style="padding:6px 8px;text-align:center;color:#64748b;font-weight:700;border-bottom:1px solid #e2e8f0;">배점</th>
+                        <th style="padding:6px 8px;text-align:left;color:#64748b;font-weight:700;border-bottom:1px solid #e2e8f0;">세부 기준</th>
+                        <th style="padding:6px 8px;text-align:center;color:#64748b;font-weight:700;border-bottom:1px solid #e2e8f0;">점수</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="border-bottom:1px solid #f1f5f9;">
+                        <td style="padding:6px 8px;font-weight:700;color:#1e293b;">상권점수</td>
+                        <td style="padding:6px 8px;text-align:center;color:#64748b;">70점</td>
+                        <td style="padding:6px 8px;color:#64748b;">유동인구·점포밀도·주말지수 종합</td>
+                        <td style="padding:6px 8px;text-align:center;font-weight:700;color:#3b82f6;">${s.zoneScore}점</td>
+                    </tr>
+                    <tr style="border-bottom:1px solid #f1f5f9;">
+                        <td style="padding:6px 8px;font-weight:700;color:#1e293b;">업종 적합성</td>
+                        <td style="padding:6px 8px;text-align:center;color:#64748b;">10점</td>
+                        <td style="padding:6px 8px;color:#64748b;">테이크아웃 vs 홀 운영 적합도</td>
+                        <td style="padding:6px 8px;text-align:center;font-weight:700;color:#3b82f6;">${s.bizScore}점</td>
+                    </tr>
+                    <tr style="border-bottom:1px solid #f1f5f9;">
+                        <td style="padding:6px 8px;font-weight:700;color:#1e293b;">층수 적합성</td>
+                        <td style="padding:6px 8px;text-align:center;color:#64748b;">10점</td>
+                        <td style="padding:6px 8px;color:#64748b;">1층 가시성·진입성 기준</td>
+                        <td style="padding:6px 8px;text-align:center;font-weight:700;color:#3b82f6;">${s.floorScore}점</td>
+                    </tr>
+                    <tr>
+                        <td style="padding:6px 8px;font-weight:700;color:#1e293b;">접근성</td>
+                        <td style="padding:6px 8px;text-align:center;color:#64748b;">10점</td>
+                        <td style="padding:6px 8px;color:#64748b;">홍대입구역 도보거리</td>
+                        <td style="padding:6px 8px;text-align:center;font-weight:700;color:#3b82f6;">${s.walkScore}점</td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr style="background:#f8fafc;border-top:2px solid #e2e8f0;">
+                        <td colspan="3" style="padding:6px 8px;font-weight:900;color:#1e293b;">총점</td>
+                        <td style="padding:6px 8px;text-align:center;font-weight:900;color:${s.grade.color};">${s.total}점</td>
+                    </tr>
+                </tfoot>
+            </table>
+            <div style="padding:8px 10px;background:#fefce8;font-size:10px;font-weight:600;color:#854d0e;line-height:1.6;">
+                ※ 본 점수는 통계 기반 보조 지표입니다. 실제 창업 판단 시에는 상권 분위기, 경쟁 상황, 본인의 창업 스타일 등을 종합적으로 고려하시기 바랍니다.
+            </div>
         </div>`;
 
     // 도보시간 뱃지
