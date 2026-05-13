@@ -194,6 +194,19 @@ body{display:flex;flex-direction:column;background:#f8fafc;color:#0f172a;font-fa
 
 </style>
     <script>
+let _sortMode = 'default';
+function setSortMode(mode) {
+    _sortMode = mode;
+    ['default','rent','area'].forEach(m => {
+        const btn = document.getElementById('sort-'+m);
+        if(!btn) return;
+        const active = m === mode;
+        btn.style.background = active ? '#2563eb' : '#fff';
+        btn.style.color = active ? '#fff' : '#94a3b8';
+        btn.style.borderColor = active ? '#2563eb' : '#e2e8f0';
+    });
+    updateView();
+}
 function toggleBookmark(id) {
     const sid = String(id);
     if(bookmarks.has(sid)) bookmarks.delete(sid);
@@ -423,7 +436,13 @@ function switchRightTab(tab) {
             <div id="panel-dash" style="display:none;overflow-y:auto;flex:1;padding:12px;">
                 <div id="dash-content"></div>
             </div>
-            <div id="panel-list" style="display:flex;flex-direction:column;overflow-y:auto;flex:1;padding:8px;gap:8px;">
+            <div id="panel-list" style="display:flex;flex-direction:column;flex:1;overflow:hidden;">
+                <div style="display:flex;gap:4px;padding:6px 8px 4px;flex-shrink:0;border-bottom:1px solid #f1f5f9;">
+                    <button onclick="setSortMode('default')" id="sort-default" style="flex:1;padding:4px 0;font-size:10px;font-weight:700;border-radius:6px;border:1px solid #2563eb;background:#2563eb;color:#fff;cursor:pointer;">최신순</button>
+                    <button onclick="setSortMode('rent')" id="sort-rent" style="flex:1;padding:4px 0;font-size:10px;font-weight:700;border-radius:6px;border:1px solid #e2e8f0;background:#fff;color:#94a3b8;cursor:pointer;">가격순</button>
+                    <button onclick="setSortMode('area')" id="sort-area" style="flex:1;padding:4px 0;font-size:10px;font-weight:700;border-radius:6px;border:1px solid #e2e8f0;background:#fff;color:#94a3b8;cursor:pointer;">면적순</button>
+                </div>
+                <div id="panel-list-inner" style="overflow-y:auto;flex:1;padding:8px;display:flex;flex-direction:column;gap:8px;"></div>
             </div>
             <div id="panel-bookmark" style="display:none;overflow-y:auto;flex:1;padding:8px;gap:8px;flex-direction:column;">
             </div>
@@ -809,6 +828,9 @@ function _doUpdateView() {
         return true;
     });
 
+    if(_sortMode === 'rent') filtered.sort((a,b) => a['월세'] - b['월세']);
+    else if(_sortMode === 'area') filtered.sort((a,b) => b.pyeong - a.pyeong);
+
     markers.clearLayers();
     const zc = ZONE_COLORS[currentZone];
     let sumD=0,sumR=0,sumP=0;
@@ -864,7 +886,7 @@ function _doUpdateView() {
 
     // 리스트 (최대 40개씩 지연 렌더)
     const count=filtered.length;
-    const infoPanel=document.getElementById('panel-list');
+    const infoPanel=document.getElementById('panel-list-inner');
     if(!count){
         infoPanel.innerHTML='<div class="flex h-full items-center justify-center text-slate-400 text-xs font-bold">해당 조건의 매물이 없습니다.</div>';
         document.getElementById('avgTag').innerText='데이터 없음';
@@ -967,14 +989,11 @@ function openDiag() {
     if(cached && cached.walk_min !== null) {
         renderWalkBadgeInDiag(cached);
         updateAccessTab();
-        generateComment(selProp, calcScore(selProp, cached), document.getElementById('bizType')?.value||'takeout');
         return;
     }
 
     // 캐시 없으면 이 매물 1개만 fetch
     diagWalk.innerHTML = `<span class="walk-badge walk-loading">🚶 도보시간 계산중...</span>`;
-    const biz = document.getElementById('bizType')?.value||'takeout';
-    generateComment(selProp, calcScore(selProp, null), biz);
     fetchWalkTime(selProp).then(result => {
         if(result.walk_min !== null) {
             renderWalkBadgeInDiag(result);
@@ -1099,14 +1118,15 @@ async function generateComment(prop, score, bizType) {
 - 역까지 도보: ${walkStr}
 - 입지점수: ${score.total}점
 
-이 매물의 강점과 약점을 바탕으로 창업자에게 실질적인 조언을 3문장으로 써주세요. 상권 특성 → 매물 특징 → 운영 전략 순으로 자연스럽게 이어지게 쓰고, 반드시 완성된 문장으로 끝내주세요. 한국어로만 답하세요.`;
+이 매물의 강점과 약점을 바탕으로, 창업자에게 실질적인 조언을 자연스러운 문단 형태로 2~3문장으로 써주세요. 
+상권 특성 → 매물 특징 → 운영 전략 순으로 자연스럽게 이어지게 쓰고, 문장을 끊어 나열하지 말고 흐름 있게 써주세요. 한국어로만 답하세요.`;
 
         const res = await fetch('https://seungcheolmin.jkln1256.workers.dev', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
                 model: 'claude-haiku-4-5-20251001',
-                max_tokens: 400,
+                max_tokens: 300,
                 messages: [{role: 'user', content: prompt}]
             })
         });
@@ -1363,10 +1383,10 @@ async function getAiInsight(zone, sub, d) {
     try {
         const res = await fetch('https://seungcheolmin.jkln1256.workers.dev', {
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
+            headers: {'Content-Type':'application/json'},
             body: JSON.stringify({
                 model: 'claude-sonnet-4-20250514',
-                max_tokens: 400,
+                max_tokens: 300,
                 messages: [{role:'user', content: prompt}]
             })
         });
