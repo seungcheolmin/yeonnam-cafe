@@ -236,11 +236,11 @@ function openDetail(id) {
             <!-- 📌 매물 정보 -->
             <div style="border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;">
                 <div style="background:#eff6ff;padding:7px 12px;font-size:10px;font-weight:700;color:#2563eb;">📌 매물 정보</div>
-                <div style="padding:12px 14px;display:flex;flex-direction:column;gap:8px;font-size:12px;">
-                    <div style="display:flex;justify-content:space-between;"><span style="color:#94a3b8;">보증금</span><b>${p['보증금'].toLocaleString()}만원</b></div>
-                    <div style="display:flex;justify-content:space-between;"><span style="color:#94a3b8;">월세</span><b>${p['월세']}만원</b></div>
-                    <div style="display:flex;justify-content:space-between;"><span style="color:#94a3b8;">면적</span><b>${p.pyeong}평</b></div>
-                    <div style="display:flex;justify-content:space-between;"><span style="color:#94a3b8;">층수</span><b>${flStr}</b></div>
+                <div style="padding:12px 14px;display:flex;flex-direction:column;gap:10px;font-size:12px;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;"><span style="color:#94a3b8;flex-shrink:0;">보증금</span><b style="margin-left:8px;">${p['보증금'].toLocaleString()}만원</b></div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;"><span style="color:#94a3b8;flex-shrink:0;">월세</span><b style="margin-left:8px;">${p['월세']}만원</b></div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;"><span style="color:#94a3b8;flex-shrink:0;">면적</span><b style="margin-left:8px;">${p.pyeong}평</b></div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;"><span style="color:#94a3b8;flex-shrink:0;">층수</span><b style="margin-left:8px;">${flStr}</b></div>
                 </div>
             </div>
 
