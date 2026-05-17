@@ -247,7 +247,7 @@ function openDetail(id) {
             <!-- 📝 매물 특징 -->
             <div style="border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;">
                 <div style="background:#f0fdf4;padding:7px 12px;font-size:10px;font-weight:700;color:#16a34a;">📝 매물 특징</div>
-                <div style="padding:10px 12px;font-size:11px;color:#475569;line-height:1.7;">${p['특징']||'정보 없음'}</div>
+                <div style="padding:10px 12px;font-size:11px;color:#475569;line-height:1.7;word-break:keep-all;white-space:pre-wrap;">${p['특징']||'정보 없음'}</div>
             </div>
 
             <!-- 📄 상세 설명 -->
@@ -855,8 +855,13 @@ window.clickListItem = function(id, lat, lon) {
     if(lat && lon) {
         map.flyTo([lat, lon], 17, {duration:.5});
         setTimeout(() => {
-            markerPool.forEach((m, mid) => {
-                if(Number(mid) === Number(id)) m.openPopup();
+            markers.eachLayer(m => {
+                try {
+                    const ll = m.getLatLng();
+                    if(Math.abs(ll.lat - lat) < 0.0001 && Math.abs(ll.lng - lon) < 0.0001) {
+                        m.openPopup();
+                    }
+                } catch(e) {}
             });
         }, 700);
     }
@@ -1028,11 +1033,7 @@ function updateDiagState(selectedData) {
         document.getElementById('diagZoneTitle').innerText=`📍 ZONE ${selectedData.zone} 상권 및 매물 진단`;
         document.getElementById('diagZoneDesc').innerText=zoneDescriptions[selectedData.zone]||'';
         const feat=selectedData['특징']||'정보 없음';
-        const flStrDiag = selectedData['층수']===-1?'B1층':selectedData['층수']+'층';
-        document.getElementById('diagPropDesc').innerHTML=`
-            <div style="font-size:12px;font-weight:900;color:#1e293b;margin-bottom:4px;">보 ${(selectedData['보증금']||0).toLocaleString()} / ${selectedData['월세']}만원</div>
-            <div style="font-size:10px;color:#64748b;margin-bottom:4px;">${flStrDiag} · ${selectedData.pyeong||''}평</div>
-            <div style="font-size:11px;color:#475569;line-height:1.6;">${feat}</div>`;
+        document.getElementById('diagPropDesc').innerText=feat;
         // 도보정보 - 진단하기 클릭 시 채워짐
         const diagWalk=document.getElementById('diagWalkInfo');
         diagWalk.innerHTML='';
