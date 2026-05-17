@@ -853,17 +853,18 @@ window.clickListItem = function(id, lat, lon) {
 
     // 3. 지도 이동 + 팝업 열기
     if(lat && lon) {
-        map.flyTo([lat, lon], 17, {duration:.5});
+        map.setView([lat, lon], 18, {animate: true, duration: 0.5});
         setTimeout(() => {
-            // markerPool에서 id로 찾기
             markerPool.forEach((m, mid) => {
                 if(mid === id || mid === Number(id)) {
-                    map.addLayer && markers.zoomToShowLayer
-                        ? markers.zoomToShowLayer(m, () => m.openPopup())
-                        : m.openPopup();
+                    if(markers.zoomToShowLayer) {
+                        markers.zoomToShowLayer(m, () => { setTimeout(() => m.openPopup(), 200); });
+                    } else {
+                        m.openPopup();
+                    }
                 }
             });
-        }, 700);
+        }, 600);
     }
 
     // 4. 즉시 렌더 후 스크롤
