@@ -225,7 +225,7 @@ function openDetail(id) {
             <button onclick="document.getElementById('prop-detail-overlay').remove()" style="background:none;border:none;font-size:18px;cursor:pointer;color:#94a3b8;">×</button>
         </div>
         <div style="overflow-y:auto;flex:1;min-height:0;padding:14px;display:flex;flex-direction:column;gap:10px;">
-            <img src="${p['사진URL']||''}" style="width:100%;height:180px;object-fit:cover;border-radius:10px;background:#f1f5f9;" onerror="this.style.display='none'">
+            <img src="${p['사진URL']||''}" style="width:100%;height:180px;object-fit:cover;border-radius:10px;background:#f1f5f9;" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 320 180\'%3E%3Crect width=\'320\' height=\'180\' fill=\'%23f1f5f9\'/%3E%3Ctext x=\'160\' y=\'95\' text-anchor=\'middle\' fill=\'%2394a3b8\' font-size=\'13\' font-family=\'sans-serif\'%3E이미지 준비중%3C/text%3E%3C/svg%3E'">
             <div style="display:flex;gap:6px;flex-wrap:wrap;">
                 <span style="background:#eff6ff;color:#2563eb;font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;">ZONE ${p.zone}</span>
                 <span style="background:#f1f5f9;color:#64748b;font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;">${flStr}</span>
@@ -282,7 +282,7 @@ function renderBookmarks() {
         + bmList.map(p => {
             const id = p['ID(매물번호)'];
             const flStr = p['층수']===-1?'B1층':p['층수']+'층';
-            const photo = p['사진URL']||'https://via.placeholder.com/200x80';
+            const photo = p['사진URL']||'data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 80'%3E%3Crect width='200' height='80' fill='%23f1f5f9'/%3E%3Ctext x='100' y='45' text-anchor='middle' fill='%2394a3b8' font-size='11' font-family='sans-serif'%3E이미지 준비중%3C/text%3E%3C/svg%3E';
             return '<div class="list-card" onclick="clickListItem('+id+','+p['위도']+','+p['경도']+')" style="cursor:pointer;">'
                 + '<img src="'+photo+'" class="w-full h-20 object-cover rounded-lg mb-2" style="background:#f1f5f9;" onerror="this.src=\'https://via.placeholder.com/200x80\'">'
                 + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">'
@@ -853,7 +853,7 @@ window.clickListItem = function(id, lat, lon) {
 
     // 3. 지도 이동 + 팝업 열기
     if(lat && lon) {
-        map.setView([lat, lon], 18, {animate: true, duration: 0.5});
+        map.flyTo([lat, lon], 17, {duration:.5});
         setTimeout(() => {
             markerPool.forEach((m, mid) => {
                 if(mid === id || mid === Number(id)) {
@@ -946,8 +946,8 @@ function _doUpdateView() {
                     icon: isSel ? makePinIcon('#2563eb', true) : makeCircleIcon(mc),
                     zIndexOffset: isSel ? 1000 : 0
                 });
-                const photo=p['사진URL']||'https://via.placeholder.com/200x110';
-                m.bindPopup(`<img src="${photo}" class="popup-img" onerror="this.src='https://via.placeholder.com/160x100'"><div style="padding:6px 8px;"><div style="font-size:11px;font-weight:700;color:#1e293b;text-align:center;margin-bottom:4px;">보 ${p['보증금']} / ${p['월세']}</div><div style="text-align:center;"><button id="pop-bm-${id}" onclick="event.stopPropagation();toggleBookmark(${id});this.textContent=bookmarks.has(String(${id}))?'⭐':'☆';" style="background:none;border:none;cursor:pointer;font-size:20px;line-height:1;padding:0;">${bookmarks.has(String(id))?'⭐':'☆'}</button></div></div>`,{closeButton:true,offset:[0,-4],autoPan:false,maxWidth:160});
+                const photo=p['사진URL']||'data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 80'%3E%3Crect width='200' height='80' fill='%23f1f5f9'/%3E%3Ctext x='100' y='45' text-anchor='middle' fill='%2394a3b8' font-size='11' font-family='sans-serif'%3E이미지 준비중%3C/text%3E%3C/svg%3E';
+                m.bindPopup(`<img src="${photo}" class="popup-img" onerror="this.src='data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 100'%3E%3Crect width='160' height='100' fill='%23f1f5f9'/%3E%3Ctext x='80' y='55' text-anchor='middle' fill='%2394a3b8' font-size='10' font-family='sans-serif'%3E이미지 준비중%3C/text%3E%3C/svg%3E'"><div style="padding:6px 8px;"><div style="font-size:11px;font-weight:700;color:#1e293b;text-align:center;margin-bottom:4px;">보 ${p['보증금']} / ${p['월세']}</div><div style="text-align:center;"><button id="pop-bm-${id}" onclick="event.stopPropagation();toggleBookmark(${id});this.textContent=bookmarks.has(String(${id}))?'⭐':'☆';" style="background:none;border:none;cursor:pointer;font-size:20px;line-height:1;padding:0;">${bookmarks.has(String(id))?'⭐':'☆'}</button></div></div>`,{closeButton:true,offset:[0,-4],autoPan:false,maxWidth:160});
                 m.on('mouseover',function(){ this.openPopup(); });
                 m.on('mouseout',function(){ if(id!==selectedId) this.closePopup(); });
                 m.on('click',function(){ clickListItem(id,p['위도'],p['경도']); setTimeout(()=>this.openPopup(), 50); });
@@ -980,10 +980,10 @@ function _doUpdateView() {
                 const id=p['ID(매물번호)'];
                 const isSel=id===selectedId;
                 const flStr=p['층수']===-1?'B1층':p['층수']+'층';
-                const photo=p['사진URL']||'https://via.placeholder.com/200x96';
+                const photo=p['사진URL']||'data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 80'%3E%3Crect width='200' height='80' fill='%23f1f5f9'/%3E%3Ctext x='100' y='45' text-anchor='middle' fill='%2394a3b8' font-size='11' font-family='sans-serif'%3E이미지 준비중%3C/text%3E%3C/svg%3E';
                 const isBookmarked = bookmarks.has(String(id));
                 return `<div id="card-${id}" class="list-card${isSel?' active':''}" onclick="clickListItem(${id},${p['위도']},${p['경도']})">
-                    <img data-src="${photo}" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E" class="w-full h-20 object-cover rounded-lg mb-2 lazy-img" style="background:#f1f5f9;" onerror="this.closest('.list-card').style.display='none'">
+                    <img data-src="${photo}" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E" class="w-full h-20 object-cover rounded-lg mb-2 lazy-img" style="background:#f1f5f9;" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 200 80\'%3E%3Crect width=\'200\' height=\'80\' fill=\'%23f1f5f9\'/%3E%3Ctext x=\'100\' y=\'45\' text-anchor=\'middle\' fill=\'%2394a3b8\' font-size=\'11\' font-family=\'sans-serif\'%3E이미지 준비중%3C/text%3E%3C/svg%3E'">
                     <div class="flex items-center justify-between mb-1">
                         <span class="px-2 py-0.5 rounded bg-slate-100 text-[10px] font-bold text-slate-500">ZONE ${p.zone} ${flStr} · ${p.pyeong}평</span>
                         <button onclick="event.stopPropagation();toggleBookmark(${id})" id="bm-${id}" style="background:none;border:none;cursor:pointer;font-size:16px;padding:2px 4px;line-height:1;">${isBookmarked?'⭐':'☆'}</button>
