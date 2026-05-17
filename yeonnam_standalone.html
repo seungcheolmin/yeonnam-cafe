@@ -218,13 +218,13 @@ function openDetail(id) {
     if(existing) existing.remove();
     const overlay = document.createElement('div');
     overlay.id = 'prop-detail-overlay';
-    overlay.style.cssText = 'position:absolute;top:0;right:380px;width:320px;height:100%;background:#fff;z-index:9999;box-shadow:-4px 0 20px rgba(0,0,0,0.12);display:flex;flex-direction:column;animation:slideIn .2s ease;';
+    overlay.style.cssText = 'position:absolute;top:0;right:380px;width:320px;height:100%;background:#fff;z-index:9999;box-shadow:-4px 0 20px rgba(0,0,0,0.12);display:flex;flex-direction:column;animation:slideIn .2s ease;overflow:hidden;';
     overlay.innerHTML = `
         <div style="flex-shrink:0;padding:12px 14px;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;justify-content:space-between;">
             <span style="font-size:12px;font-weight:700;color:#1e293b;">📋 매물 상세</span>
             <button onclick="document.getElementById('prop-detail-overlay').remove()" style="background:none;border:none;font-size:18px;cursor:pointer;color:#94a3b8;">×</button>
         </div>
-        <div style="overflow-y:auto;flex:1;padding:14px;display:flex;flex-direction:column;gap:10px;">
+        <div style="overflow-y:auto;flex:1;min-height:0;padding:14px;display:flex;flex-direction:column;gap:10px;">
             <img src="${p['사진URL']||''}" style="width:100%;height:180px;object-fit:cover;border-radius:10px;background:#f1f5f9;" onerror="this.style.display='none'">
             <div style="display:flex;gap:6px;flex-wrap:wrap;">
                 <span style="background:#eff6ff;color:#2563eb;font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;">ZONE ${p.zone}</span>
@@ -855,13 +855,13 @@ window.clickListItem = function(id, lat, lon) {
     if(lat && lon) {
         map.flyTo([lat, lon], 17, {duration:.5});
         setTimeout(() => {
-            markers.eachLayer(m => {
-                try {
-                    const ll = m.getLatLng();
-                    if(Math.abs(ll.lat - lat) < 0.0001 && Math.abs(ll.lng - lon) < 0.0001) {
-                        m.openPopup();
-                    }
-                } catch(e) {}
+            // markerPool에서 id로 찾기
+            markerPool.forEach((m, mid) => {
+                if(mid === id || mid === Number(id)) {
+                    map.addLayer && markers.zoomToShowLayer
+                        ? markers.zoomToShowLayer(m, () => m.openPopup())
+                        : m.openPopup();
+                }
             });
         }, 700);
     }
@@ -982,7 +982,7 @@ function _doUpdateView() {
                 const photo=p['사진URL']||'https://via.placeholder.com/200x96';
                 const isBookmarked = bookmarks.has(String(id));
                 return `<div id="card-${id}" class="list-card${isSel?' active':''}" onclick="clickListItem(${id},${p['위도']},${p['경도']})">
-                    <img data-src="${photo}" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E" class="w-full h-20 object-cover rounded-lg mb-2 lazy-img" style="background:#f1f5f9;" onerror="this.src='https://via.placeholder.com/200x80'">
+                    <img data-src="${photo}" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E" class="w-full h-20 object-cover rounded-lg mb-2 lazy-img" style="background:#f1f5f9;" onerror="this.closest('.list-card').style.display='none'">
                     <div class="flex items-center justify-between mb-1">
                         <span class="px-2 py-0.5 rounded bg-slate-100 text-[10px] font-bold text-slate-500">ZONE ${p.zone} ${flStr} · ${p.pyeong}평</span>
                         <button onclick="event.stopPropagation();toggleBookmark(${id})" id="bm-${id}" style="background:none;border:none;cursor:pointer;font-size:16px;padding:2px 4px;line-height:1;">${isBookmarked?'⭐':'☆'}</button>
