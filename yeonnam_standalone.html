@@ -236,7 +236,7 @@ function openDetail(id) {
             <!-- 📌 매물 정보 -->
             <div style="border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;">
                 <div style="background:#eff6ff;padding:7px 12px;font-size:10px;font-weight:700;color:#2563eb;">📌 매물 정보</div>
-                <div style="padding:12px 14px;display:grid;grid-template-columns:50px 1fr;gap:8px;font-size:12px;align-items:center;">
+                <div style="padding:12px 14px;display:grid;grid-template-columns:50px 1fr;gap:8px;font-size:12px;align-items:center;max-height:120px;overflow-y:auto;">
                     <span style="color:#94a3b8;">보증금</span><b>${p['보증금'].toLocaleString()}만원</b>
                     <span style="color:#94a3b8;">월세</span><b>${p['월세']}만원</b>
                     <span style="color:#94a3b8;">면적</span><b>${p.pyeong}평</b>
@@ -247,7 +247,7 @@ function openDetail(id) {
             <!-- 📝 매물 특징 -->
             <div style="border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;">
                 <div style="background:#f0fdf4;padding:7px 12px;font-size:10px;font-weight:700;color:#16a34a;">📝 매물 특징</div>
-                <div style="padding:10px 12px;font-size:11px;color:#475569;line-height:1.7;word-break:break-all;white-space:normal;">${p['특징']||'정보 없음'}</div>
+                <div style="padding:10px 12px;font-size:11px;color:#475569;line-height:1.7;word-break:break-all;white-space:normal;max-height:100px;overflow-y:auto;">${p['특징']||'정보 없음'}</div>
             </div>
 
             <!-- 📄 상세 설명 -->
